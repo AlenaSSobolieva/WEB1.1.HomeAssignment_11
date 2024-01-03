@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
-from fastapi_contacts.app.routes import app
+from fastapi_contacts.app.routes import router
 
-client = TestClient(app)
+client = TestClient(router)
 
 def test_create_contact():
     # Test creating a contact
@@ -66,9 +66,6 @@ def test_get_contact_by_id():
     assert isinstance(response.json()["name"], str)
     assert isinstance(response.json()["birthday"], str)  # If your birthday is stored as a string
 
-    # Add more assertions based on your specific requirements and data structure
-
-    # Add more assertions based on your specific requirements and data structure
     assert isinstance(response.json()["surname"], str)
     assert isinstance(response.json()["email"], str)
     assert isinstance(response.json()["phone_number"], str)
@@ -90,5 +87,3 @@ def test_get_contact_by_id():
     assert isinstance(response.json()["phone_number"], str)
     assert isinstance(response.json()["birthday"], str)
 
-    # You can add more specific checks based on your application requirements
-    # For example, check if the birthday is in a valid date format, etc.

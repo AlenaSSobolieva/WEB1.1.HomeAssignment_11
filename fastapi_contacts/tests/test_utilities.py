@@ -1,18 +1,11 @@
 # fastapi_contacts/tests/test_main.py
 from fastapi.testclient import TestClient
-from fastapi_contacts.app.routes import app
-from fastapi_contacts.app.database import engine
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from fastapi_contacts.main import app
+from fastapi_contacts.app.database import SessionLocal
 from fastapi_contacts.app.routes import get_db
 
-# Create a test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 # Override the dependency to use the test database
-app.dependency_overrides[get_db] = TestingSessionLocal
+app.dependency_overrides[get_db] = SessionLocal
 
 client = TestClient(app)
 
@@ -52,7 +45,6 @@ def test_read_contacts():
     for contact in response.json():
         assert isinstance(contact, dict)
 
-        # Add more assertions based on the expected structure of a contact
         assert "id" in contact and isinstance(contact["id"], int)
         assert "name" in contact and isinstance(contact["name"], str)
         assert "surname" in contact and isinstance(contact["surname"], str)
@@ -60,8 +52,6 @@ def test_read_contacts():
         assert "phone_number" in contact and isinstance(contact["phone_number"], str)
         assert "birthday" in contact and isinstance(contact["birthday"], str)
         assert "additional_info" in contact  # Assuming additional_info is optional
-
-        # Add more specific assertions based on your application's requirements
 
     # Ensure that the list is not empty
     assert len(response.json()) > 0
@@ -112,8 +102,6 @@ def test_read_contact():
     assert isinstance(response.json()["phone_number"], str)
     assert isinstance(response.json()["birthday"], str)
 
-    # Add more assertions based on your specific requirements and data structure
-
 
 def test_update_contact():
     # First, create a contact to update later
@@ -150,8 +138,6 @@ def test_update_contact():
     assert response.json()["birthday"] == "2000-01-01"
     assert response.json()["additional_info"] == "Updated additional information"
 
-    # Add more assertions based on your specific requirements and data structure
-
 
 def test_delete_contact():
     # First, create a contact to delete later
@@ -184,32 +170,21 @@ def test_delete_contact():
     assert deleted_response.status_code == 404  # 404 Not Found
     assert "detail" in deleted_response.json() and deleted_response.json()["detail"] == "Contact not found"
 
-    # Add more assertions based on your specific requirements and data structure
-
 
 # Remove the test database after all tests are done
 def finalizer():
-    TestingSessionLocal().close()
+    SessionLocal().close()
 
 def test_finalizer():
     # Ensure that the test database is properly closed and cleaned up
     try:
-        # Perform any finalization steps if needed
-
-        # For example, you might want to commit and close any remaining transactions
-        # Or perform additional cleanup steps related to the test database
-
-        # Add more finalization steps if needed
-        # For demonstration purposes, you can add a print statement
         print("Finalization steps completed successfully")
 
         # Ensure that the finalization steps are successful
         assert True, "Finalization steps completed successfully"
     except Exception as e:
-        # Handle exceptions that might occur during finalization
-        # Log or print the exception details for debugging
         print(f"Error during finalization: {e}")
         assert False, f"Error during finalization: {e}"
     finally:
         # Close the test database connection and clean up resources
-        TestingSessionLocal().close()
+        SessionLocal().close()

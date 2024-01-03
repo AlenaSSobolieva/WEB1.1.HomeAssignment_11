@@ -1,6 +1,6 @@
 # app/crud.py
 from sqlalchemy.orm import Session
-from .models import Contact
+from fastapi_contacts.app.models import Contact
 
 def create_contact(db: Session, contact_data: dict):
     db_contact = Contact(**contact_data)
